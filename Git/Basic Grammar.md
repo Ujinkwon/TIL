@@ -386,7 +386,7 @@ print(dict_b)            # {a='apple', b='banana', list=[1, 2, 3]}
     ```
 
     * 3. int, float, list, tuple, dict => str
-    ``
+    ```
     print(str(1))                # int 1
     print(str(1.0))              # float 1.0
     print(str([1, 2, 3]))        # list [1, 2, 3]
@@ -395,4 +395,4 @@ print(dict_b)            # {a='apple', b='banana', list=[1, 2, 3]}
     ```
 * 컨테이너 형 변환
 
-![](img/컨테이너%20형%20변환.png)
+s![](img/컨테이너%20형%20변환.png)
