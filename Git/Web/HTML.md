@@ -96,4 +96,25 @@
   * input label
     * label을 클릭해 input 자체의 초점을 맞추거나 활성화 시킬 수 있음
     * 사용자는 선택할 수 있는 영역이 늘어나 웹 / 모바일 환경에서 편하게 사용 가능
-    * 
+    * 화면리더기에서도 label을 읽어 쉽게 내용을 확인 할 수 있도록 함
+    * <input>에 id 속성을, <label>에는 for 속성을 활용해 상호 연관을 시킴
+  ```html
+  <label for="agreement">개인정보 수집에 동의합니다.</label>
+  <input type="checkbox" name="agreement" id="agreement">
+  ```
+
+  * input 유형 - `일반`
+    * text : 일반 텍스트 입력
+    * password : 입력 시 값이 보이지 않고 문자를 특수기호(*)로 표현
+    * email : 이메일 형식이 아닌 경우 form 제출 불가
+    * number : min, max, step 속성을 활용해 숫자 범위 설정 가능
+    * file : accept 속성을 활용해 파일 타입 지정 가능
+  * input 유형 - `항목 중 선택`
+    * 일반적으로 label 태그와 함께 사용해 선택 항목을 작성함
+    * 동일 항목에 대해서는 name을 지정하고 선택된 항목에 대한 value를 지정해야 함
+      * checkbox : 다중 선택
+      * radio button : 단일 선택
+  * input 유형 - `기타`
+    * color : color picker
+    * date : date picker
+    * hidden : 사용자에게 보이지 않는 input
