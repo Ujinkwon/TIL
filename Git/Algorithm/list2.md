@@ -10,7 +10,9 @@
   * 1234
   * 5678
   * 9101112
+  * 13141516
   
+* zip(*arr) => 쉽게 2차원 배열 풀어 출력하는 법
 
 i : 행 / j : 열
 ## 행 우선 순회
@@ -33,7 +35,7 @@ for i in range(n):
     for j in range(m):
         arr[i][j + (m-1-2*j) * (i%2)]
 ```
-## 4방향의 인접 배열 요소 탐색
+## 4방향의 인접 배열 요소 탐색 (델타를 이용한 배열 탐색)
 ```python
 arr = [list(map(int, input().split())) for _ in range(N)]   # N*N 배열
 di = [0, 0, -1, 1]   # 좌우
@@ -43,18 +45,19 @@ for i in range(1, N):
         for k in range(4):
             ni = j + di[k]
             nj = i + dj[k]
-            if 0 <= ni < N and 0 <= nj < N:
+            if 0 <= ni < N and 0 <= nj < N: # 유효한 인덱스인지 확인
                 print(arr[ni][nj])
 ```
 
-## 전치 행렬
+## 전치 행렬 (대각선을 기준으로 원소를 교환)
 ```python
 arr = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 for i in range(3):
     for j in range(3):
-        if i < j:
+        if i < j:  # 대각선을 기준으로 한 번만 바꾸기 위한 조건문 (조건문 없으면 원상복귀)
             arr[i][j], arr[j][i] = arr[j][i], arr[i][j]
 ```
+
 ## 부분집합
 * 집합 원소 n개 => 공집합 포함 부분집합 수 2^n개
 ```python
