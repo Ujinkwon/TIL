@@ -122,8 +122,91 @@ def bruteforce2(p, t):
 ## KMP 알고리즘
 * 불일치가 발생한 앞 부분에 대해서 다시 비교하지 않고 수행
 * 비교 실패한 부분을 반복되는 부분 뒤부터 비교 반복
+```python
+def pre_process(pattern):
+    # 전처리를 위한 테이블을 작성 (LPS table longest prefix suffix)
+    lps = [0] * len(pattern)
+    j = 0   # lps를 만들기 위한 prefix index
+
+    for i in range(1, len(pattern)):    # 0번째 자리는 패턴 확인 필요 X
+        # prefix index 위치에 있는 문자와 비교
+        if pattern[i] == pattern[j]:
+            lps[i] = j + 1   # i 앞에 중복 패턴 존재
+            j += 1            # j는 중복 글자 자리 수
+        else:
+            j = 0
+            # 여기서 0으로 이동한 다음 prefix idx 비교를 한 번 더 해야함
+            if pattern[i] == pattern[j]:
+                lps[i] = j + 1
+                j += 1
+    
+    return lps
+
+
+def KMP(text, pattern):
+    lps = pre_process(pattern)   # 전처리로 lps 테이블 생성
+
+    i, j = 0, 0    # text idx, pattern idx
+    while i < len(text):
+        if pattern[j] == text[i]:    # 같은 문자라면
+            # 다음 문자 비교 
+            i += 1
+            j += 1
+        else:
+            if j != 0:
+                j = lps[j - 1]
+            else:
+                i += 1
+
+        if j == len(pattern):    # pattern 전부 일치
+            return i - j         # text 위치 리턴
+
+    return -1         # 일치하는 문장 없는 경우
+
+    
+text = 'ABC ABCDAB ABCDABCDABDE'
+pattern = 'ABCDABD'
+print(KMP(text, pattern))
+```
   
 ## 보이어-무어 알고리즘
 * 오른쪽에서 왼쪽으로 비교
 * 패턴에서 일치하는 문자를 찾아서 그 문자와 비교
 * 일치하는 문자가 없으면 길이만큼 이동
+```python
+def pre_process(pattern):
+    m = len(pattern)   # 패턴의 길이
+    
+    skip_table = dict()
+    for i in range(m-1):
+        skip_table[pattern[i]] = m - i - 1
+
+    return skip_table
+
+
+def boyer_moore(text, pattern):
+    skip_table = pre_process(pattern)
+    m = len(pattern)
+    i = 0   # text idx
+
+    while i <= len(text) - m:
+        j = m - 1    # 뒤에서 비교
+        k = i + (m - 1)  # 비교 시작 idx
+        # 비교할 j가 남아있고, text와 pattern이 일치하면 그 다음 앞 글자 비교를 위해 인덱스 감소
+        while j >= 0 and pattern[j] == text[k]:
+            j -= 1
+            k -= 1
+        if j == -1:   # 일치
+            return i
+        
+        # 일치X
+        else:
+            # i 비교할 시작 위치를 skip table에서 가져옴
+            i += skip_table.get(text[i+m-1], m)
+    return -1   # 일치 패턴 X
+    
+    
+text = 'ABC ABCDAB ABCDABCDABDE'
+pattern = 'ABCDABD'
+print(boyer_moore(text, pattern))
+```
