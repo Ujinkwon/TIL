@@ -75,4 +75,5 @@
 14) 관리자 아이디, 비번 생성
 14-1) python manage.py createsuperuser
 
- 
+accounts에 login만들기
+base.html에 
