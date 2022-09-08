@@ -293,3 +293,33 @@ def change_password(request):
     }
     return render(request, 'accounts/change_password.html', context)
 ```
+
+# Limiting access to logged-in users
+* 로그인 사용자에 대해 접근 제한
+
+## `is_authenticated` attribute
+* 사용자가 인증되었는지 여부 확인
+* 일반적으로 request.user에서 이 속성 사용
+* 권한과 관련 X, 활성화 상태인지, 유효한 세션을 갖는지 확인 X
+* 로그인, 비로그인 상태에서 출력되는 링크 다르게 설정 가능
+  * 인증된 사용자만 게시글 작성 링크 볼 수 있도록..
+  * But 비로그인 상태로 url을 입력하면 글 작성 페이지 이동 가능
+* 인증된 사용자는 로그인 로직 수행할 수 없도록 처리
+  
+## The `login_required` decorator
+* 사용자가 로그인 되어 있으면 정상적으로 view 함수 실행
+* 로그인 하지 않은 경우 settings.py의 LOGIN_URL 문자열 주소로 redirect
+  * LOGIN_URL 기본 값 => /accounts/login/
+* 로그인 상태에서만 글을 작성/수정/삭제 할 수 있도록 수정
+  * url 입력 시에도 적용
+* 인증 성공 시 사용자가 redirect 되어야 하는 경로는 "next" 쿼리 문자열 매개변수에 저장
+  * /accounts/login/?next=/articles/create/
+  * `next` query string parameter
+    * 로그인이 정상적으로 진행되면 이전에 요청했던 주소로 redirect 하기 위해 제공해주는 쿼리 스트링 파라미터
+    * 별도로 처리 해주지 않으면 view에 설정한 redirect경로로 이동
+    * 별도 처리 => 로그인 진행 후 원했던 경로로 이동
+        ```python 
+        next = request.GET.get('next')
+        return redirect(next or 'articles:index')
+        ```
+    * 주의 : login 템플릿에서 form action이 작성되어 있으면 동작X
