@@ -1,8 +1,16 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Article
 from .forms import ArticleForm
 
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import(
+    require_http_methods,
+    require_POST,
+    require_safe,
+)
+
 # Create your views here.
+@require_safe
 def index(request):
     articles = Article.objects.all()
     context = {
@@ -10,6 +18,8 @@ def index(request):
     }
     return render(request, 'articles/index.html', context)
 
+@login_required
+@require_http_methods(['POST', 'GET'])
 def create(request):
     if request.method == 'POST':
         # 저장
@@ -25,6 +35,7 @@ def create(request):
     }
     return render(request, 'articles/create.html', context)
 
+@require_safe
 def detail(request, pk):
     article = Article.objects.get(pk=pk)
     context = {
@@ -32,13 +43,19 @@ def detail(request, pk):
     }
     return render(request, 'articles/detail.html', context)
 
+@login_required
+@require_POST
 def delete(request, pk):
-    article = Article.objects.get(pk=pk)
-    article.delete()
-    return redirect('articles:index')
+    article = get_object_or_404(Article, pk=pk)
+    if request.method == 'POST':
+        article.delete()
+        return redirect('articles:index')
+    return redirect('articles:detail', article.pk)
 
+@login_required
+@require_http_methods(['GET', 'POST'])
 def update(request, pk):
-    article = Article.objects.get(pk=pk)
+    article = get_object_or_404(Article, pk=pk)
     if request.method == 'POST':
         # 업데이트
         form = ArticleForm(request.POST, instance=article)
