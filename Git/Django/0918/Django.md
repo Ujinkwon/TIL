@@ -339,3 +339,266 @@ article.delete()
 * 모델 class를 admin.py에 등록하고 관리     
   * admin.site.register(모델class)
 * python manage.py createsuperuser : 관리자 계정 생성
+
+------
+
+# Django Form
+* 사용자가 입력한 데이터의 형식이 맞는지 `유효성 검증` 반드시 필요
+## Form 선언
+* 앱 폴더에 forms.py를 생성 후 class 선언
+* form에는 TextField 존재 X
+* as_p() : 각 필드가 p태그로 감싸져서 렌더링
+* as_ul() : 각 필드가 li 태그로 감싸져서 렌더링
+  * ul 태그는 직접 작성
+* as_table() : 각 필드가 tr 태그로 감싸져서 렌더링
+* HTML input 요소 표현
+  * Form fields 
+    * 입력에 대한 유효성 검사 로직 처리
+    * 템플릿에서 직접 사용
+  * Widgets
+    * 웹 페이지의 HTML input 요소 렌더링 담당
+    * input 요소의 단순한 출력 부분 담당
+    * 반드시 form field에 할당
+    * ex) content = forms.CharField(widget=forms.Textarea)
+
+## ModelForm 선언
+* forms 라이브러리에서 파생된 ModelForm 클래스 상속받음
+* 정의한 ModelForm 클래스 안에 Meta 클래스 선언
+* 어떤 모델을 기반으로 form을 작성할 건지 정보를 Meta 클래스에 지정
+```python
+class Meta:
+    model = Article
+    fields = '__all__' or exclude = ('title',)
+```
+* Meta data : 데이터를 표현하기 위한 데이터
+* 함수의 이름을 그대로 출력 시 : 함수의 `참조 값`을 출력
+  * 참조값 : 함수 자체를 그대로 전달 해, 다른 함수에서 `필요한 시점에 호출하는 경우` 사용
+* 함수를 호출 후 출력 시 : 함수의 `반환 값`을 출력
+* is_valid() 반환 값이 False인 경우, form 인스턴스의 errors 속성에 유효성 검증을 실패한 원인이 딕셔너리 형태로 저장됨
+* ModelForm의 하위 클래스는 키워드 인자 instance 여부로 생성할 지, 수정할 지 결정
+  * 제공되지 않은 경우 save()는 지정된 모델의 새 인스턴스를 생성
+  * 제공된 경우 save()는 해당 인스턴스를 수정
+
+## Form / ModelForm
+* Form 
+  * 사용자로부터 받는 데이터가 DB와 연관되어 있지 않는 경우 사용
+  * DB에 영향을 미치지 않고 단순 데이터만 사용되는 경우 ex) 로그인
+* ModelForm 
+  * 사용자로부터 받는 데이터가 DB와 연관되어 있는 경우 사용
+  * 데이터 유효성 검사가 끝나면 데이터를 각각 어떤 레코드에 매핑해야 할지 알고 있기 때문에 바로 save() 호출 가능
+
+
+# Handling HTTP requests
+* new-create, edit-update 를 하나의 view 함수에서 method에 따라 로직이 분리되도록 변경
+* new, edit 은 GET 요청 처리만, create, update는 POST 요청 처리만 진행
+```python
+# new + create
+def create(request):
+    if request.method == 'POST':
+        form = ArticleForm(request.POST)
+        if form.is_valid():
+            article = form.save()
+            return redirect('articles:detail', article.pk)
+    else:
+        form = ArticleForm()
+    context = {
+        'form' : form
+    }
+    return render(request, 'articles/create.html', context)
+```
+```python
+# edit + update
+def update(request, pk):
+    article = Article.objects.get(pk=pk)
+    if request.method == 'POST':
+        form = ArticleForm(request.POST, instance=article)
+        if form.is_valid():
+            form.save()
+            return redirect('articles:detail', article.pk)
+    else:
+        form = ArticleForm(instance=article)
+    context = {
+        'form' : form,
+        'article' : article,
+    }
+    return render(request, 'articles/update.html', context)
+```
+```python
+# delete
+def delete(request, pk):
+    article = Article.objects.get(pk=pk)
+    if request.method == 'POST':
+        article.delete()
+        return redirect('articles:index')
+    return redirect('articles:detail', article.pk)
+```
+
+
+# View decorators
+* Decorator
+  * 기존 함수에 기능을 추가하고 싶을 때, 함수를 수정하지 않고 기능을 추가해주는 함수
+* `from django.views.decorators.http` import
+  * require_http_methods(['GET', 'POST']) : view 함수가 특정 요청 method만 허용하도록 하는 데코레이터 
+  * require_POST : view 함수가 POST 요청 method만 허용하도록 하는 데코레이터
+  * require_safe : view 함수가 GET 요청 method만 허용하도록 하는 데코레이터 
+
+
+-------
+
+# The Django authentication system
+* 인증 시스템 = 인증(Authentication) + 권한(Authorization)
+  * 신원 확인 + 권한 부여
+* 필수 구성 : django.contrib.auth
+* 사전 설정
+  * app accounts 생성, 등록
+  * url 분리, 매핑
+* 개발자들이 작성하는 일부 프로젝트에서는 django에서 제공하는 built-in User model의 기본 인증 요구사항이 적절하지 않을 수 있음 => `Custom User Model`로 대체
+* 대체하기
+    ```python
+    # accounts/models.py
+    from django.contrib.auth.models import AbstractUser
+    # AbstractUser : 관리자 권한과 함께 완전한 기능을 가지고 있는 User model을 구현하는 추상 기본클래스
+    class User(AbstractUser):
+        pass
+    ```
+    * 기존 user 클래스도 AbstractUser를 상속받기 때문에 같은 모습을 가지게 됨
+* settings.py에서 사용할 User Model을 결정하는 `AUTH_USER_MODEL` 설정 값으로 defalt user model을 재정의할 수 있도록 함 => AUTH_USER_MODEL = 'accounts.User'
+  * `프로젝트 처음에 진행하기` 왕 중요 
+* admin.py에 커스텀 User 모델 등록
+    ```python
+    # accounts/admin.py
+    from django.contrib import admin
+    from django.contrib.auth.admint import UserAdmin
+    from .models import User
+    admin.site.register(User, UserAdmin)
+    ```
+
+* 프로젝트 중간에 AUTH_USER_MODEL을 생성한 경우 => `데이터베이스 초기화`
+  * migrations 파일 삭제 : 번호가 붙은 파일만
+  * db.sqlite3 삭제
+  * migrations 진행 : makemigrations > migrate
+
+# HTTP (Hyper Text Tranfer Protocol)
+* HTML 문서와 같은 리소스들을 가져올 수 있도록 해주는 프로토콜
+* 클라이언트 - 서버 프로토콜이라고도 부름
+* 요청 : 클라이언트에 의해 전송되는 메세지
+* 응답 : 서버에서 응답으로 전송되는 메세지
+* 특징 
+  * 비 연결 지향 (connectionless)
+    * 서버는 요청에 대한 응답을 보낸 후 연결을 끊음
+  * 무상태 (stateless)
+    * 클라이언트와 서버가 주고받는 메세지들은 서로 완전히 독립적
+  * 서버와 클라이언트 간 지속적인 상태 유지를 위해선 `쿠키와 세션`이 존재
+
+## 쿠키 (Cookie)
+* 상태가 있는 세션을 만들도록 해 줌
+* 사용자가 웹사이트를 방문할 경우 웹사이트의 서버를 통해서 사용자의 컴퓨터에 설치되는 작은 기록 정보 파일
+  * 브라우저는 쿠키를 로컬에 key-value 형식으로 저장
+  * `동일한 서버에 재요청 시 저장된 쿠키를 같이 전송`
+* 사용 목적
+  * 세션 관리 : 로그인, 아이디 자동완성, 장바구니 등 정보 관리
+  * 개인화 : 사용자 선호, 테마 등 설정
+  * 트래킹 : 사용자 행동을 기록 및 분석
+
+## 세션 (Session)
+* 사이트와 특정 브라우저 사이의 상태를 유지시키는 것
+* 클라이언트가 서버에 접속하면 서버가 특정 session id를 발급, 클라이언트는 `session id를 쿠키에 저장`
+  * 같은 서버에 재접속시 요청과 함께 쿠키를 서버에 전달
+* session id는 세션을 구별하기 위해 필요, 쿠키에는 이것만 저장
+* Session cookie : 현재 세션 종료시 삭제, 브라우저 종료와 함께 세션 삭제
+* Persistent cookies : expires 속성에 지정된 날짜 or max-age 속성에 지정된 기간이 지나면 삭제
+
+# Authentication in Web requests
+## Login
+* session을 create하는 과정
+* built-in form : AuthenticationForm
+  * 사용자 정보 입력 받음
+  * 기본적으로 username, password를 받아서 데이터가 유효한지 검증
+  * request를 첫번째 인자로 취함
+* `login(request, form.get_user())`
+* get_user() 
+  * AuthenticationForm의 인스턴스 메서드
+  * 유효성 검사 통과한 경우, 로그인 한 사용자 객체 반환
+
+* 현재 로그인 되어있는 유저 정보 출력
+  * base 템플릿에서 user 변수 사용
+  * 어떻게 context 데이터 없이 사용?
+    * settings.py의 `context processors` 때문에 가능
+    * context processors : 템플릿이 렌더링 될 때 호출 가능한 컨텍스트 데이터 목록
+    * django.contrib.auth.context_processors.auth
+
+## Logout 
+* session을 delete하는 과정
+* `logout(request)`
+* 현재 요청에 대한 session data를 DB에서 삭제
+* 클라이언트 쿠키에서도 session id 삭제
+
+# Custom user & Built-in auth forms
+* 커스텀 유저 모델 사용시 확장해야하는 forms
+  * UserCreationForm
+  * UserChangeForm
+* Meta class가 등록된 form이므로 반드시 커스텀해야 됨
+```python
+# accounts/forms.py
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+class CustomUserCreationForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        model = get_user_model()
+class CustomUserChangeForm(UserChangeForm):
+    class Meta(UserChangeForm.Meta):
+        model = get_user_model()
+        fields = ('email', 'first_name', 'last_name',)
+```
+* get_user_model() : `현재 프로젝트에서 활성화된 사용자 모델`을 반환
+
+## 회원 가입
+* User를 create하는 것
+* built-in form : UserCreationForm
+  * username, password로 권한이 없는 새 user를 생성하는 모델폼
+  * CustomUserCreationForm 으로 확장하여 사용
+
+## 회원 탈퇴
+* DB에서 유저를 delete하는 것
+* 탈퇴 후 로그아웃 순서 지킬 것 => 먼저 로그아웃 하면 해당 요청 객체 정보가 없어지기 때문에 탈퇴에 필요한 정보 또한 없어짐
+
+## 회원정보 수정
+* 유저를 update하는 것
+* built-in form : UserChangeForm
+  * 사용자의 정보, 권한을 변경하기 위해 admin 인터페이스에서 사용되는 모델폼
+  * CustomUserChangeForm 으로 확장하여 사용
+    * 접근 가능한 필드 조정
+
+## 비밀번호 변경
+* built-in form : PasswordChangeForm
+  * 이전 비밀번호를 입력해 비밀번호를 변경할 수 있도록 함
+  * PasswordChangeForm(request.user, request.POST)
+* 암호 변경 시 세션 무효화 방지
+  * 기존 세션과 회원 인증 정보가 일치하지 않게 되어 로그인 상태가 유지되지 못함
+  * `update_session_auth_hash(request, user)`
+
+
+# Limiting access to logged-in users
+* 로그인 사용자에 대한 접근 제한
+* `is_authenticated`
+  * user model 속성 중 하나
+  * 사용자가 인증되었는지 여부 판단 가능
+  * 일반적으로 request.user에서 이 속성을 사용
+  * `권한과 관련없으며, 유효한 세션을 가지는지도 확인하지 않음`
+  * 로그인한 유저만 볼 수 있도록 처리 => 비로그인 상태로도 url 접근 가능
+
+* `login_required` decorator
+  * 사용자가 로그인 되어 있으면 정상적으로 view 함수 실행
+  * 로그인 하지 않은 경우 settings.py의 LOGIN_URL 문자열 주소로 redirect
+    * LOGIN_URL의 기본 값 = /accounts/login/
+  * 인증 성공 시 사용자가 redirect 되어야하는 경로는 'next' 쿼리 문자열 매개 변수에 저장 ex) /accounts/login/?next=/articles/create/
+  * 'next' query string parameter : 로그인 진행 후, 요청했던 주소로 redirect하기 위해 Django가 제공해주는 쿼리 스트링 파라미터
+  * return redirect(`request.GET.get('next')` or 'articles:index')
+  * 주의사항 : login 템플릿에서 form action이 적혀 있으면 동작 X
+
+* @require_POST 와 @login_required 로 발생하는 구조적 문제
+  * 로그인 성공 후 GET method로 next 파라미터 주소에 리다이렉트 됨
+  * 1. redirect 과정에서 POST 요청 데이터 손실
+  * 2. redirect로 인한 요청은 GET 요청 메서드로만 요청됨
+  * 해결방안 : `@login_required는 GET request method를 처리할 수 있는 view 함수에서만 사용해야함`
+    * POST method만 허용하는 delete 같은 함수는 내부에서 is_authenticated 속성 값으로 처리
