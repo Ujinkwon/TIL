@@ -128,7 +128,6 @@
 * {% block content %}{% endblock content %} : 하위 템플릿이 채울 수 있는 공간
 * 스켈레톤 템플릿을 앱안의 template이 아니라, 프로젝트의 template 내에 위치하고 싶으면, settings.py 의 `TEMPLATES의 DIRS 값에 [BASE_DIR / 'templates']` 코드 작성
 
-`01_121` HTTP, GET
 
 # URLs
 * django 에서는 모든 주소가 '/'(trailing slash)로 끝나도록 구성 => 복수의 페이지에서 같은 콘텐츠가 존재하는 것을 방지
