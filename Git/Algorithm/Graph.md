@@ -1,3 +1,16 @@
+# 위상 정렬 (Topological Sort)
+* 방향 그래프에서 간선으로 주어진 정점 간 `선후관계를 위배하지 않는 정렬`
+* Directed Acyclic Graph에서만 정의
+* 사이클 존재 => 위상 정렬에 모든 정점이 포함되지 않게 됨
+  * 위상 정렬 후, 결과에 모든 정점 존재 안하면 => 사이클있는 그래프
+* `구현`
+  * 정점들의 indegree 정보를 담은 배열 저장
+  * indegree가 0인 정점들을 큐에 저장
+  * 큐에서 하나 pop해 위상 정렬
+  * 정렬된 정점과 연결된 모든 정점의 indegree 배열 값 -1
+  * indegree 값이 0이 되면 큐에 append
+  * 큐가 빌 때까지 반복
+
 # 서로소 집합 (Disjoint-sets)
 * 서로소 or 상호배타 집합 : 서로 중복 포함된 원소가 없는 집합들
 * 대표자 : 각 집합을 구분하는 집합에 속한 하나의 특정 멤버
@@ -64,19 +77,97 @@ def link(x, y):
 
 # Prim 알고리즘
 * 하나의 정점에서 연결된 간선들 중에 하나씩 선택하면서 MST를 만들어 가는 방식
-  * 임의 정점 하나 선택
-  * 선택한 정점과 인접 정점 중 최소 비용의 간선이 존재하는 정점 선택
-  * 모든 정점이 선택될 때 까지 반복
+* 우선 순위 큐로 구현
+* `구현`
+  * 임의 정점 하나 선택해서 최소 신장 트리에 추가
+  * 해당 정점과 연결된 모든 간선을 우선순위 큐에 추가
+  * 우선순위 큐에서 비용이 가장 작은 간선을 pop
+    * 해당 간선이 최소 신장 트리에 포함된 두 정점을 연결한다면, continue
+    * 최소 신장 트리에 포함된 정점과 포함되지 않은 정점을 연결한다면, 
+      * 해당 간선과 포함되지 않는 정점을 최소 신장 트리에 추가
+      * 포함되지 않는 정점과 최소 신장 트리에 포함되지 않은 정점을 연결하는 모든 간선을 우선순위 큐에 추가
+  * 최소 신장 트리에 v-1개의 간선이 추가 될 때 까지 반복
 * 서로소인 2개의 집합 정보 유지
   * 트리 정점들 : MST 만들기 위해 선택된 정점들
   * 비트리 정점들 : 선택되지 않은 정점들
 
+```python
+import heapq
+
+n, e = map(int, input().split())
+G = [[] for _ in range(n)]
+for _ in range(e):
+  u, v, w = map(int, input().split())
+  G[u].append((w, v))
+  G[v].append((w, u))
+
+visited = [0]*n
+u = 0
+visited[u] = 1
+
+heap = []
+# u와 연결된 간선 추가
+for i in G[u]:
+  heappush(heap, i)
+
+total = 0
+cnt = 0
+while cnt < n-1:
+  w, v = heappop(heap)
+  if visited[v]:
+    continue
+  visited[v] = 1
+  cnt += 1
+  total += w
+  for i in G[v]:
+    if not visited[i[1]]:
+      heappush(heap, i)
+
+print(total)
+```
+
+
 # KRUSKAL 알고리즘
 * 간선을 하나씩 선택해서 MST를 찾는 알고리즘
-  * 최초, 모든 간선을 가중치에 따라 `오름차순`으로 정렬
-  * 가중치가 가장 낮은 간선부터 선택하면서 트리 증가
-    * 사이클 존재 시, 가중치가 다음으로 낮은 간선 선택
-  * n-1개 간선이 선택될 때 까지 반복
+* 사이클을 만들지 않으면서, 비용이 작은 간선부터 차례대로 최소 신장 트리에 추가하는 그리디 알고리즘
+* union find 알고리즘으로 구현
+* `구현`
+  * 간선 비용을 오름차순으로 정렬 후, 가장 낮은 비용부터 탐색
+  * 간선으로 연결하는 정점 두개가 같은 그룹이라면, continue
+  * 다른 그룹이라면, 같은 그룹으로 만들고 해당 간선을 최소 신장 트리에 추가
+  * 최소 신장 트리에 v-1 개의 간선을 추가할 때 까지 반복
+```python
+def find_set(x):
+  while x != p[x]:
+    x = p[x]
+  return x
+
+def union(x, y):
+  p[find_set(y)] = find_set(x)
+
+def kruskal():
+  n = v+1
+  cnt, total = 0, 0
+  for u, v, w in arr:
+    if find_set(u) != find_set(v):
+      cnt += 1
+      union(u, v)
+      total += w
+      if cnt == n-1:
+        return total
+
+v, e = map(int, input().split())
+arr = []
+for _ in range(e):
+  u, v, w = map(int, input().split())
+  arr.append([u, v, w])
+
+arr.sort(key=lambda x:x[2])
+p = [i for i in range(v+1)]
+
+print(kruskal())
+```
+
 
 # 최단 경로
 * 간선의 가중치가 있는 그래프에서 간선의 가중치의 합이 최소인 경로
