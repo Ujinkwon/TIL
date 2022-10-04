@@ -1,11 +1,19 @@
-arr = [1, 2, 3, 4, 5, 6, 7]
+arr = [1, 2, 3, 4, 5, 6]
 
-res = [[]]
+res = []
+for i in range(1 << len(arr)):
+    sub = []
+    for j in range(len(arr)):
+        if i & (1 << j):
+            sub.append(arr[j])
+    res.append(sub)
+
+sub = [[]]
 for i in arr:
-    size = len(res)
+    size = len(sub)
     for j in range(size):
-        res.append(res[j] + [i])
-    
+        sub.append(sub[j] + [i])
+
 def perm(arr, n):
     res = []
     if n == 0:
@@ -13,7 +21,7 @@ def perm(arr, n):
     for i in range(len(arr)):
         num = arr[i]
         for j in perm(arr[:i]+arr[i+1:], n-1):
-            res.append([num]+j)
+            res.append([num] + j)
     return res
 
 def combi(arr, n):
@@ -23,6 +31,8 @@ def combi(arr, n):
     for i in range(len(arr)):
         num = arr[i]
         for j in combi(arr[i+1:], n-1):
-            res.append([num]+j)
+            res.append([num] + j)
     return res
-print(combi(arr, 2))
+
+print(perm(arr, 3))
+print(combi(arr, 3))
