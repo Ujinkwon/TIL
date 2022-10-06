@@ -1,9 +1,41 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<nav class="navbar navbar-expand-lg bg-light" style='height: 80px'>
+    <div class="container-fluid">
+    <a class="navbar-brand fs-1" href="{% url 'eithers:create' %}">Either Game Create</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse d-flex justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link active fs-5 mx-4" href="{% url 'eithers:index' %}">BACK</a>
+        </li>
+        </ul>
+    </div>
+    </div>
+</nav>
+<div class='d-flex justify-content-center my-5'>
 <form action="" method='POST'>
     {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit">
+    <div class='my-2 w-75'>
+        Title
+        <br>
+        {{ form.title }}
+    </div>
+    <div class='my-2'>
+        Issue a
+        <br>
+        {{ form.issue_a }}
+    </div>
+    <div class='my-2'>
+        Issue b
+        <br>
+        {{ form.issue_b }}
+    </div>
+    <br>
+    <input type="submit" value='Submit'>
 </form>
+</div>
 {% endblock content %}
