@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h3>DETAIL</h3>
+<a href="{% url 'eithers:index' %}">BACK</a>
+<hr>
+<h1>{{ either.title }}</h1>
+<hr>
+<h4>댓글 작성</h4>
+
+{% endblock content %}
