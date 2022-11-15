@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./test2.css">
+</head>
+<body>
+    <!-- <div class="parent">
+        <div class="cube">
+            <div class="cube-face cube-face-front"></div>
+            <div class="cube-face cube-face-back"></div>
+            <div class="cube-face cube-face-right"></div>
+            <div class="cube-face cube-face-left"></div>
+            <div class="cube-face cube-face-top"></div>
+            <div class="cube-face cube-face-bottom"></div>
+        </div>
+    </div> -->
+
+
+    <div id="wrap">
+        <section id="diceBox">
+          <div class="dice_wrap">
+            <div class="dice01">
+              <div class="dice_inner">
+                <div class="dice">
+                  <div class="face1">1</div>
+                  <div class="face2">2</div>
+                  <div class="face3">3</div>
+                  <div class="face4">4</div>
+                  <div class="face5">5</div>
+                  <div class="face6">6</div>
+                </div>
+              </div>
+            </div>
+            <div class="dice02">
+              <div class="dice_inner">
+                <div class="dice">
+                  <div class="face1">1</div>
+                  <div class="face2">2</div>
+                  <div class="face3">3</div>
+                  <div class="face4">4</div>
+                  <div class="face5">5</div>
+                  <div class="face6">6</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button id="btnRolling">주사위 굴리기</button>
+        </section>
+      </div>
+
+
+      <script>
+        //  translateZ는  .dice의 가로값 절반이면 됨
+// 리사이징 될 떄마다 계산
+var dice = document.querySelectorAll('.dice');
+var dice_width = dice[0].clientWidth;
+var face1 = document.querySelectorAll('.face1');
+var face2 = document.querySelectorAll('.face2');
+var face3 = document.querySelectorAll('.face3');
+var face4 = document.querySelectorAll('.face4');
+var face5 = document.querySelectorAll('.face5');
+var face6 = document.querySelectorAll('.face6');
+function DiceResizing(){
+  Array.prototype.forEach.call(face1, function(item){
+    item.style.transform = 'rotateY(0deg) translateZ(' + dice_width/2 + 'px)';
+  });
+  Array.prototype.forEach.call(face2, function(item){
+    item.style.transform = 'rotateY(90deg) translateZ(' + dice_width/2 + 'px)';
+  });
+  Array.prototype.forEach.call(face3, function(item){
+    item.style.transform = 'rotateX(90deg) translateZ(' + dice_width/2 + 'px)';
+  });
+  Array.prototype.forEach.call(face4, function(item){
+    item.style.transform = 'rotateX(270deg) translateZ(' + dice_width/2 + 'px)';
+  });
+  Array.prototype.forEach.call(face5, function(item){
+    item.style.transform = 'rotateY(270deg) translateZ(' + dice_width/2 + 'px)';
+  });
+  Array.prototype.forEach.call(face6, function(item){
+    item.style.transform = 'rotateY(180deg) translateZ(' + dice_width/2 + 'px)';
+  });
+}
+
+DiceResizing();
+
+window.onresize = function(){
+  dice_width = dice[0].clientWidth;
+  DiceResizing();
+};
+
+// 랜덤 주사위 눈
+var RandomNumber = function(){
+  return 'face' + Math.floor(Math.random()*6);
+};
+function rolling(){
+  dice[0].classList.add(RandomNumber());
+  dice[1].classList.add(RandomNumber());
+}
+
+// 주사위 굴리기
+var btnRolling = document.querySelector('#btnRolling');
+btnRolling.onclick = function(){
+  dice[0].classList.value = "dice";
+  dice[1].classList.value = "dice";
+  rolling();
+};
+      </script>
+</body>
+</html>

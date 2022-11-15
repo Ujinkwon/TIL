@@ -1,0 +1,44 @@
+@import "bourbon";
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,300);
+
+html,
+body {
+  display: table;
+  width: 100%;
+  height: 100%;
+  background: black;
+}
+
+.hello {
+  color: white;
+  letter-spacing: 2px;
+  font-size: 25px;
+  font-family: "roboto";
+  font-weight: 300;
+}
+
+#main-ctr {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.content {
+  border: 1px solid black;
+  display: inline-block;
+  position: relative;
+}
+
+svg {
+    
+  @include transform(scale(.5));
+  
+  #smile-up,
+  #circle,
+  #eye-to-left,
+  #eye-to-right,
+  #wink,
+  #bg {
+    visibility: hidden;
+  }
+}

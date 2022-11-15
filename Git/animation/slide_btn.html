@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./slide_btn.css">
+</head>
+<body>
+    <input type="range" class="slideToUnlock" value="0" max="100">
+
+    <script>
+        document.querySelector("input[type=\"range\"]").onmouseup = function() {
+    var theRange = this.value;
+    if(theRange == 100) {
+
+			unlock();
+
+		} else {
+			document.init = setInterval(function() {
+				if(document.querySelector("input[type=\"range\"]").value != 0) {
+					document.querySelector("input[type=\"range\"]").value = theRange--;
+				}
+			}, 1);
+		}
+}
+
+document.querySelector("input[type=\"range\"]").onmousedown = function() {
+		clearInterval(document.init);
+}
+
+function unlock() {
+    document.querySelector("input[type=\"range\"]").style.opacity = "0";
+}
+    </script>
+</body>
+</html>

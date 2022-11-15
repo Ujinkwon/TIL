@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./3d_carousel.css">
+</head>
+<body>
+    <section id="slideshow">
+        <p class="slideshow-title">3D Carousel with Modals</p>
+        <div class="entire-content">
+            <div class="content-carousel">
+                <!-- Note that the text in images' alt attribute will be the caption of the image in its modal -->
+                <figure class="shadow"><img src="https://images.pexels.com/photos/2246950/pexels-photo-2246950.jpeg?cs=rgb" alt="Caption 1"/></figure>
+                <figure class="shadow"><img src="https://images.pexels.com/photos/68704/pexels-photo-68704.jpeg?cs=rgb" alt="Caption 2"/></figure>
+                <figure class="shadow"><img src="https://images.pexels.com/photos/2749090/pexels-photo-2749090.jpeg?cs=rgb" alt="Caption 3"/></figure>
+                <figure class="shadow"><img src="https://images.pexels.com/photos/2319032/pexels-photo-2319032.jpeg?cs=rgb" alt="Caption 4"/></figure>
+                <!-- Keep duplicating figure tabs you can have more image in the carousel. -->
+            </div>
+        </div>
+        
+        <!-- Modals -->
+        <div class="modal">
+          <span class="close">×</span>
+          <!-- The image index starts from 0 for JS's sake :D -->
+          <img class="modal-content" id="img0">
+          <div class="caption"></div>
+        </div>
+        
+        <div class="modal">
+          <span class="close">×</span>
+          <img class="modal-content" id="img1">
+          <div class="caption"></div>
+        </div>
+        
+        <div class="modal">
+          <span class="close">×</span>
+          <img class="modal-content" id="img2">
+          <div class="caption"></div>
+        </div>
+        
+        <div class="modal">
+          <span class="close">×</span>
+          <img class="modal-content" id="img3">
+          <div class="caption"></div>
+        </div>
+        <!-- Just keep duplicating modal section and change the image id you can have more images in your carousel -->
+    </section>
+
+
+    <script>
+        /* 
+ * Credit:
+ * Modal: https://www.runoob.com/try/try.php?filename=trycss_image_modal_js
+ * 3D-carrousel: https://codepen.io/jaskiranchhokar/pen/wmGXav
+ * Modified by Hilbert Kong
+ */
+
+var modals = document.getElementsByClassName("modal");
+
+for(let i = 0; i < modals.length; i++) {
+    let modal = modals[i];
+    
+    let img = document.getElementsByClassName("content-carousel")[0].getElementsByTagName("img")[i];
+    let modalImg = document.getElementById("img" + i);
+    let captionText = document.getElementsByClassName("caption")[i];
+    
+    img.onclick = function () {
+        modal.style.display = "block";
+        modalImg.src = this.src;
+        modalImg.alt = this.alt;
+        captionText.innerHTML = this.alt;
+    }
+    
+    let span = document.getElementsByClassName("close")[i];
+    
+    span.onclick = function () {
+        modal.style.display = "none";
+    }
+}
+    </script>
+</body>
+</html>
