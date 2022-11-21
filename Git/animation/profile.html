@@ -66,7 +66,7 @@
              <a class="profile-menu-link">About</a>
             </div>
             <div class="follow-buttons">
-             <button class="follow">645,321</button>
+             <!-- <button class="follow">645,321</button> -->
              <button class="follow follow-option">Follow</button>
             </div>
            </div>
@@ -107,22 +107,19 @@
           </div>
          </div>
 
-
-
     <script>
-const allVideos = document.querySelectorAll('.video');
+    const allVideos = document.querySelectorAll('.video');
 
-allVideos.forEach((v) => {
- v.addEventListener('mouseover', () => {
-  const video = v.querySelector('video');
-  video.play();
- });
- v.addEventListener('mouseleave', () => {
-  const video = v.querySelector('video');
-  video.pause();
- });
-});
-
+    allVideos.forEach((v) => {
+    v.addEventListener('mouseover', () => {
+      const video = v.querySelector('video');
+      video.play();
+    });
+    v.addEventListener('mouseleave', () => {
+      const video = v.querySelector('video');
+      video.pause();
+    });
+    });
     </script>
 </body>
 </html>

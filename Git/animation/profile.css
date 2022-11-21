@@ -461,6 +461,7 @@ body {
   cursor: pointer;
  }
  
+ 
  .follow-buttons {
   display: flex;
  }
@@ -480,7 +481,7 @@ body {
  }
  
  .follow-option {
-  border-radius: 0 25px 25px 0;
+  border-radius: 0 0 0 0;
   margin-left: -2px;
  }
  
